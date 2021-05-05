@@ -1,8 +1,8 @@
 # Operation System
 ## Assignment 1
 
-* Agatha Marcella
+> Agatha Marcella
 
-* 1313618006
+> 1313618006
 
-* Ilmu Komputer
+> Ilmu Komputer
