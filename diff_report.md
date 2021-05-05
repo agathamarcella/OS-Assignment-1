@@ -13,31 +13,76 @@ Line 16 :
 CS333_UPROGS += _date
 ```
 
+## proc.c
+
+Line 152 : 
+```c
+p->start_ticks = ticks;
+```
+
+Line 567-573 : 
+```c
+   #ifdef CS333_P1
+  int elapsed_millisec = ticks - p->start_ticks;
+  int elapsed_sec = elapsed_millisec / 1000;
+  int modulo_elapsed =  elapsed_millisec % 1000;
+  cprintf("%d\t%s\t\t%d.%d\t%s\t%d\t" , p->pid, p->name, elapsed_sec, modulo_elapsed, state_string, p->sz);
+  return;
+  #endif // CS333_P1S
+```
+
+## proc.h
+
+Line 52 : 
+```c
+uint start_ticks;
+```
+
 ## syscall.c
 
-Line 109-111 : 
+Line 109-112 : 
 ```c
 #ifdef CS333_P1
 extern int sys_date(void);
 #endif
 ```
-Line 138-140 : 
+Line 139-141 : 
 ```c
 #ifdef CS333_P1
+// internally, the function prototype must be ’int’ not ’uint’ for sys_date()
 [SYS_date]    sys_date,
 #endif
 ```
-Line 169-171 : 
+Line 182-185 : 
+```c
+    #ifdef PRINT_SYSCALLS
+    cprintf("%s -> %d\n",
+            syscallnames[num], curproc->tf->eax);
+    #endif
+```
+
+## syscall.h
+
+Line 24 : 
+```c
+#define SYS_date    SYS_halt+1
+```
+
+## sysproc.c
+
+Line 101-111 : 
 ```c
 #ifdef CS333_P1
-  [SYS_date]    "date",
+int
+sys_date(void)
+{
+  struct rtcdate *d;
+  if(argptr(0, (void*)&d, sizeof(struct rtcdate)) < 0)
+    return -1;
+  cmostime(d);
+  return 0;
+}
 #endif
-```
-Line 184-186 : 
-```c
-    #if defined CS333_P1 && defined PRINT_SYSCALLS
-    cprintf("%s -> %d\n", syscallnames[num], curproc->tf->eax);
-    #endif
 ```
 
 ## user.h
@@ -54,53 +99,4 @@ int date(struct rtcdate*);
 Line 33 : 
 ```c
 SYSCALL(date)
-```
-
-## syscall.h
-
-Line 25 : 
-```c
-#define SYS_date    SYS_halt+1
-```
-
-## sysproc.c
-
-Line 101-112 : 
-```c
-#ifdef CS333_P1
-int
-sys_date(void)
-{
-  struct rtcdate *d;
-
-  if(argptr(0, (void*)&d, sizeof(struct rtcdate)) < 0)
-    return -1;
-  cmostime(d);
-  return 0;
-}
-#endif
-```
-
-## proc.h
-
-Line 52 : 
-```c
-#ifdef CS333_P1
-  uint start_ticks;
-#endif
-```
-
-## proc.c
-
-Line 151-153 : 
-```c
-#ifdef CS333_P1
-  p->start_ticks = ticks;
-#endif
-```
-
-Line 568-569 : 
-```c
-  uint elapsed_ms = ticks - p->start_ticks;
-  cprintf("%d\t%s\t\t%d.%d\t%s\t%d\t", p->pid, p->name, elapsed_ms/1000, elapsed_ms%1000, state_string, p->sz);
 ```
