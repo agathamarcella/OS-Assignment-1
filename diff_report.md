@@ -1,167 +1,26 @@
 # Code Modification
 
 Yang diubah dalam XV6 :
+## defs.h
+
+line 12-14 :
+```c
+#ifdef CS333_P2
+struct uproc;
+#endif // CS333_P2
+```
+line 130-132 :
+```c
+#ifdef CS333_P2
+int             getprocs(uint max, struct uproc* table);
+#endif // CS333_P2
+```
+
 ## Makefile
 
 line 3 :
 ```c
 CS333_PROJECT ?= 2
-```
-
-## syscall.c
-
-line 110-121 :
-```c
-#ifdef CS333_P2
-extern int sys_getuid(void);
-extern int sys_getgid(void);
-extern int sys_getppid(void);
-extern int sys_setuid(void);
-extern int sys_setgid(void);
-extern int sys_getprocs(void);
-#endif // CS333_P2
-```
-line 150-157 :
-```c
-#ifdef CS333_P2
-[SYS_getuid]  sys_getuid,
-[SYS_getgid]  sys_getgid,
-[SYS_getppid] sys_getppid,
-[SYS_setuid]  sys_setuid,
-[SYS_setgid]  sys_setgid,
-[SYS_getprocs]  sys_getprocs,
-#endif // CS333_P2
-```
-line 186-196 :
-```c
-  #ifdef CS333_P1
-  [SYS_date]    "date",
-#endif
-#ifdef CS333_P2
-  [SYS_getuid]  "getuid",
-  [SYS_getgid]  "getgid",
-  [SYS_getppid] "getppid",
-  [SYS_setuid]  "setuid",
-  [SYS_setgid]  "setgid",
-  [SYS_getprocs]  "getprocs",
-#endif // CS333_P2
-```
-line 209 :
-```c
-    #if defined CS333_P1 && defined PRINT_SYSCALLS
-```
-
-## user.h
-
-line 28-38
-```c
-#ifdef CS333_P2
-uint getuid(void);
-uint getgid(void);
-uint getppid(void);
-int setuid(uint);
-int setgid(uint);
-int getprocs(uint max, struct uproc* table);
-#endif // CS333_P2
-```
-
-## usys.S
-
-line 34-39 :
-```c
-SYSCALL(getuid)
-SYSCALL(getgid)
-SYSCALL(getppid)
-SYSCALL(setuid)
-SYSCALL(setgid)
-SYSCALL(getprocs)
-```
-
-## syscall.h
-
-line 26-31 :
-```c
-#define SYS_date    SYS_halt+1
-#define SYS_getuid  SYS_date+1
-#define SYS_getgid  SYS_getuid+1
-#define SYS_getppid SYS_getgid+1
-#define SYS_setuid  SYS_getppid+1
-#define SYS_setgid  SYS_setuid+1
-#define SYS_getprocs  SYS_setgid+1
-```
-
-## sysproc.c
-
-line 113-171 :
-```c
-#ifdef CS333_P2
-// Get process UID
-uint sys_getuid(void)
-{
-  return myproc()->uid;
-}
-
-// Get process GID
-uint sys_getgid(void)
-{
-  return myproc()->gid;
-}
-
-// Get process PPID
-uint sys_getppid(void)
-{
-  if(!myproc()->parent)
-    return myproc()->pid;
-  else
-    return myproc()->parent->pid;
-}
-
-// Set Process UID
-int sys_setuid(void)
-{
-  uint uid;
-  if(argint(0, (int*)&uid) < 0)
-    return -1;
-  if(uid < 0 || uid > 32767)
-    return -1;
-  myproc()->uid = uid;
-  return 0;
-}
-
-// Set Process GID
-int sys_setgid(void)
-{
-  uint gid;
-  if(argint(0, (int*)&gid) < 0)
-    return -1;
-  if(gid < 0 || gid > 32767)
-    return -1;
-  myproc()->gid = gid;
-  return 0;
-}
-
-// Get process information
-int sys_getprocs(void)
-{
-  uint max;
-  struct uproc* table;
-  if(argint(0, (void*)&max) < 0)
-    return -1;
-  if(argptr(1, (void*)&table, sizeof(&table) * max) < 0)
-    return -1;
-  return getprocs(max, table);
-}
-#endif // CS333_P2
-```
-
-## proc.h
-
-line 53-56
-```c
-  uint uid;                    // UID
-  uint gid;                    // GID
-  uint cpu_ticks_total;        // For process execution time
-  uint cpu_ticks_in;           // For process execution time
 ```
 
 ## proc.c
@@ -259,35 +118,14 @@ getprocs(uint max, struct uproc* table)
 #endif // CS333_P2
 ```
 
-## defs.h
+## proc.h
 
-line 12-14 :
+line 53-56
 ```c
-#ifdef CS333_P2
-struct uproc;
-#endif // CS333_P2
-```
-line 130-132 :
-```c
-#ifdef CS333_P2
-int             getprocs(uint max, struct uproc* table);
-#endif // CS333_P2
-```
-
-## testsetuid.c
-
-```c
-#ifdef CS333_P2
-#include "types.h"
-#include "user.h"
-
-int
-main(int argc, char *argv[])
-{
-  printf(1, "***** In %s: my uid is %d\n\n", argv[0], getuid());
-  exit();
-}
-#endif
+  uint uid;                    // UID
+  uint gid;                    // GID
+  uint cpu_ticks_total;        // For process execution time
+  uint cpu_ticks_in;           // For process execution time
 ```
 
 ## ps.c
@@ -337,6 +175,142 @@ main(void)
 #endif // CS333_P2
 ```
 
+## syscall.c
+
+line 110-121 :
+```c
+#ifdef CS333_P2
+extern int sys_getuid(void);
+extern int sys_getgid(void);
+extern int sys_getppid(void);
+extern int sys_setuid(void);
+extern int sys_setgid(void);
+extern int sys_getprocs(void);
+#endif // CS333_P2
+```
+line 150-157 :
+```c
+#ifdef CS333_P2
+[SYS_getuid]  sys_getuid,
+[SYS_getgid]  sys_getgid,
+[SYS_getppid] sys_getppid,
+[SYS_setuid]  sys_setuid,
+[SYS_setgid]  sys_setgid,
+[SYS_getprocs]  sys_getprocs,
+#endif // CS333_P2
+```
+line 186-196 :
+```c
+  #ifdef CS333_P1
+  [SYS_date]    "date",
+#endif
+#ifdef CS333_P2
+  [SYS_getuid]  "getuid",
+  [SYS_getgid]  "getgid",
+  [SYS_getppid] "getppid",
+  [SYS_setuid]  "setuid",
+  [SYS_setgid]  "setgid",
+  [SYS_getprocs]  "getprocs",
+#endif // CS333_P2
+```
+line 209 :
+```c
+    #if defined CS333_P1 && defined PRINT_SYSCALLS
+```
+
+## syscall.h
+
+line 26-31 :
+```c
+#define SYS_date    SYS_halt+1
+#define SYS_getuid  SYS_date+1
+#define SYS_getgid  SYS_getuid+1
+#define SYS_getppid SYS_getgid+1
+#define SYS_setuid  SYS_getppid+1
+#define SYS_setgid  SYS_setuid+1
+#define SYS_getprocs  SYS_setgid+1
+```
+
+## sysproc.c
+
+line 113-171 :
+```c
+#ifdef CS333_P2
+// Get process UID
+uint sys_getuid(void)
+{
+  return myproc()->uid;
+}
+
+// Get process GID
+uint sys_getgid(void)
+{
+  return myproc()->gid;
+}
+
+// Get process PPID
+uint sys_getppid(void)
+{
+  if(!myproc()->parent)
+    return myproc()->pid;
+  else
+    return myproc()->parent->pid;
+}
+
+// Set Process UID
+int sys_setuid(void)
+{
+  uint uid;
+  if(argint(0, (int*)&uid) < 0)
+    return -1;
+  if(uid < 0 || uid > 32767)
+    return -1;
+  myproc()->uid = uid;
+  return 0;
+}
+
+// Set Process GID
+int sys_setgid(void)
+{
+  uint gid;
+  if(argint(0, (int*)&gid) < 0)
+    return -1;
+  if(gid < 0 || gid > 32767)
+    return -1;
+  myproc()->gid = gid;
+  return 0;
+}
+
+// Get process information
+int sys_getprocs(void)
+{
+  uint max;
+  struct uproc* table;
+  if(argint(0, (void*)&max) < 0)
+    return -1;
+  if(argptr(1, (void*)&table, sizeof(&table) * max) < 0)
+    return -1;
+  return getprocs(max, table);
+}
+#endif // CS333_P2
+```
+
+## testsetuid.c
+
+```c
+#ifdef CS333_P2
+#include "types.h"
+#include "user.h"
+
+int
+main(int argc, char *argv[])
+{
+  printf(1, "***** In %s: my uid is %d\n\n", argv[0], getuid());
+  exit();
+}
+#endif
+```
+
 ## time.c
 
 ```c
@@ -378,4 +352,30 @@ main(int argc, char* argv[])
   exit();
 }
 #endif // CS333_P2
+```
+
+## user.h
+
+line 28-38
+```c
+#ifdef CS333_P2
+uint getuid(void);
+uint getgid(void);
+uint getppid(void);
+int setuid(uint);
+int setgid(uint);
+int getprocs(uint max, struct uproc* table);
+#endif // CS333_P2
+```
+
+## usys.S
+
+line 34-39 :
+```c
+SYSCALL(getuid)
+SYSCALL(getgid)
+SYSCALL(getppid)
+SYSCALL(setuid)
+SYSCALL(setgid)
+SYSCALL(getprocs)
 ```
